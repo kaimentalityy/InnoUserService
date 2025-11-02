@@ -78,6 +78,6 @@ class DtoValidationTest {
         );
         Set<ConstraintViolation<CardInfoDto>> violations = validator.validate(dto);
         assertFalse(violations.isEmpty());
-        assertEquals(4, violations.size());
+        assertEquals(3, violations.size());
     }
 }

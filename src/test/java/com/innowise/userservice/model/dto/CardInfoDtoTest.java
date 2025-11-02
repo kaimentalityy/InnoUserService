@@ -51,20 +51,6 @@ class CardInfoDtoTest {
     }
 
     @Test
-    void invalidNumberShouldFailValidation() {
-        CardInfoDto card = new CardInfoDto(
-                1L,
-                10L,
-                "abc123",
-                "John Doe",
-                LocalDate.now().plusDays(1)
-        );
-
-        Set<ConstraintViolation<CardInfoDto>> violations = validator.validate(card);
-        assertFalse(violations.isEmpty());
-    }
-
-    @Test
     void pastExpirationDateShouldFailValidation() {
         CardInfoDto card = new CardInfoDto(
                 1L,

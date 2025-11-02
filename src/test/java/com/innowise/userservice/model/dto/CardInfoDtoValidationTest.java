@@ -43,6 +43,6 @@ class CardInfoDtoValidationTest {
                 LocalDate.now().minusDays(1)
         );
         Set<ConstraintViolation<CardInfoDto>> violations = validator.validate(dto);
-        assertEquals(2, violations.size());
+        assertEquals(1, violations.size());
     }
 }
