@@ -1,5 +1,6 @@
 package com.innowise.userservice.controller;
 
+import com.innowise.userservice.model.dto.UserRegisterDto;
 import com.innowise.userservice.service.impl.UserService;
 import com.innowise.userservice.model.dto.UserDto;
 import jakarta.validation.Valid;
@@ -39,6 +40,16 @@ public class UserController {
     }
 
     /**
+     * Create a user from AuthService registration
+     * Accessible internally via AuthService call
+     */
+    @PostMapping("/register")
+    public ResponseEntity<UserDto> registerFromAuth(@Valid @RequestBody UserRegisterDto dto) {
+        UserDto createdUser = userService.createFromAuth(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
+    }
+
+    /**
      * Accessible only by ADMIN
      */
     @PreAuthorize("hasRole('ADMIN')")
@@ -64,6 +75,12 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<UserDto> getUser(@PathVariable Long id) {
         return ResponseEntity.ok(userService.findById(id));
+    }
+
+    @DeleteMapping("/internal/{email}")
+    public ResponseEntity<Void> deleteByEmailInternal(@PathVariable String email) {
+        userService.deleteByEmail(email);
+        return ResponseEntity.noContent().build();
     }
 
     /**

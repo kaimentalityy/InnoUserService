@@ -3,11 +3,11 @@ package com.innowise.userservice.service.impl;
 import com.innowise.userservice.exception.EntityNotFoundException;
 import com.innowise.userservice.mapper.UserMapper;
 import com.innowise.userservice.model.dto.UserDto;
+import com.innowise.userservice.model.dto.UserRegisterDto;
 import com.innowise.userservice.model.entity.User;
 import com.innowise.userservice.repository.dao.UserRepository;
 import com.innowise.userservice.repository.specification.UserSpecification;
 import com.innowise.userservice.service.UserServiceInterface;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
@@ -19,6 +19,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -65,6 +66,23 @@ public class UserService implements UserServiceInterface {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("User", "id", id));
         return userMapper.toUserDto(user);
+    }
+
+    @Transactional
+    public void deleteByEmail(String email) {
+        userRepository.deleteByEmail(email);
+    }
+
+    public UserDto createFromAuth(UserRegisterDto dto) {
+        User user = new User();
+        user.setName(dto.name());
+        user.setSurname(dto.surname());
+        user.setBirthDate(dto.birthDate());
+        user.setEmail(dto.email());
+        user.setCards(new ArrayList<>());
+
+        User saved = userRepository.save(user);
+        return userMapper.toUserDto(saved);
     }
 
     @Override

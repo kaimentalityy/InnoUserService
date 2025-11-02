@@ -12,6 +12,12 @@ public interface UserMapper {
     @Mapping(target = "id", ignore = true)
     User toUser(UserDto dto);
 
+    @Mapping(source = "id", target = "id")
+    @Mapping(source = "name", target = "name")
+    @Mapping(source = "surname", target = "surname")
+    @Mapping(source = "birthDate", target = "birthDate")
+    @Mapping(source = "email", target = "email")
+    @Mapping(source = "cards", target = "cards")
     UserDto toUserDto(User user);
 
     @Mapping(target = "id", ignore = true)
