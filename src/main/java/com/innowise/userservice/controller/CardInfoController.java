@@ -20,11 +20,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/cards")
+@Tag(name = "Card Info Controller", description = "API for managing card information")
 public class CardInfoController {
 
     private final CardInfoService cardInfoService;
@@ -32,7 +35,8 @@ public class CardInfoController {
     /**
      * Accessible only by ADMIN
      */
-    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Create a new card", description = "Accessible only by ADMIN")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_USER')")
     @PostMapping
     public ResponseEntity<CardInfoDto> createCard(@Valid @RequestBody CardInfoDto dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(cardInfoService.create(dto));
@@ -41,7 +45,8 @@ public class CardInfoController {
     /**
      * Accessible only by ADMIN
      */
-    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Update an existing card", description = "Accessible only by ADMIN")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<CardInfoDto> updateCard(@PathVariable Long id, @Valid @RequestBody CardInfoDto dto) {
         return ResponseEntity.ok(cardInfoService.update(id, dto));
@@ -50,7 +55,8 @@ public class CardInfoController {
     /**
      * Accessible only by ADMIN
      */
-    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Delete a card", description = "Accessible only by ADMIN")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCard(@PathVariable Long id) {
         cardInfoService.delete(id);
@@ -60,7 +66,8 @@ public class CardInfoController {
     /**
      * Accessible by ADMIN or USER
      */
-    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
+    @Operation(summary = "Get card by ID", description = "Accessible by ADMIN or USER")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_USER')")
     @GetMapping("/{id}")
     public ResponseEntity<CardInfoDto> getCard(@PathVariable Long id) {
         return ResponseEntity.ok(cardInfoService.findById(id));
@@ -69,7 +76,8 @@ public class CardInfoController {
     /**
      * Accessible only by ADMIN
      */
-    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Search cards", description = "Accessible only by ADMIN")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @GetMapping
     public ResponseEntity<Page<CardInfoDto>> searchCards(
             @RequestParam(required = false) List<Long> ids,

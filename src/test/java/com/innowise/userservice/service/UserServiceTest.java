@@ -3,8 +3,10 @@ package com.innowise.userservice.service;
 import com.innowise.userservice.exception.EntityNotFoundException;
 import com.innowise.userservice.mapper.UserMapper;
 import com.innowise.userservice.model.dto.UserDto;
+import com.innowise.userservice.model.dto.UserRegisterDto;
 import com.innowise.userservice.model.entity.CardInfo;
 import com.innowise.userservice.model.entity.User;
+import com.innowise.userservice.model.enums.UserRole;
 import com.innowise.userservice.repository.dao.UserRepository;
 import com.innowise.userservice.service.impl.CardInfoService;
 import com.innowise.userservice.service.impl.UserService;
@@ -114,5 +116,51 @@ class UserServiceTest {
 
         assertEquals(1, list.size());
         assertEquals(1L, list.get(0).id());
+    }
+
+    @Test
+    void createFromAuth_nullRole_defaultsToUser() {
+        UserRegisterDto registerDto = new UserRegisterDto(
+                "John", "Doe", LocalDate.now().minusYears(20), null, "john@example.com");
+
+        User saved = new User();
+        saved.setId(1L);
+        saved.setName("John");
+        saved.setSurname("Doe");
+        saved.setRole(UserRole.ROLE_USER);
+
+        when(userRepository.save(any(User.class))).thenReturn(saved);
+        when(userMapper.toUserDto(saved)).thenReturn(
+                new UserDto(1L, "John", "Doe", LocalDate.now().minusYears(20), "john@example.com", "ROLE_USER", null));
+
+        UserDto result = userService.createFromAuth(registerDto);
+
+        assertNotNull(result);
+        assertEquals("ROLE_USER", result.role());
+        verify(userRepository)
+                .save(argThat(user -> user.getRole() == UserRole.ROLE_USER));
+    }
+
+    @Test
+    void createFromAuth_blankRole_defaultsToUser() {
+        UserRegisterDto registerDto = new UserRegisterDto(
+                "John", "Doe", LocalDate.now().minusYears(20), "  ", "john@example.com");
+
+        User saved = new User();
+        saved.setId(1L);
+        saved.setName("John");
+        saved.setSurname("Doe");
+        saved.setRole(UserRole.ROLE_USER);
+
+        when(userRepository.save(any(User.class))).thenReturn(saved);
+        when(userMapper.toUserDto(saved)).thenReturn(
+                new UserDto(1L, "John", "Doe", LocalDate.now().minusYears(20), "john@example.com", "ROLE_USER", null));
+
+        UserDto result = userService.createFromAuth(registerDto);
+
+        assertNotNull(result);
+        assertEquals("ROLE_USER", result.role());
+        verify(userRepository)
+                .save(argThat(user -> user.getRole() == UserRole.ROLE_USER));
     }
 }

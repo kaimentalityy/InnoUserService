@@ -21,11 +21,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/users")
+@Tag(name = "User Controller", description = "API for managing users")
 public class UserController {
 
     private final UserService userService;
@@ -33,7 +36,8 @@ public class UserController {
     /**
      * Accessible only by ADMIN
      */
-    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Create a new user", description = "Accessible only by ADMIN")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @PostMapping
     public ResponseEntity<UserDto> createUser(@Valid @RequestBody UserDto dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.create(dto));
@@ -43,6 +47,7 @@ public class UserController {
      * Create a user from AuthService registration
      * Accessible internally via AuthService call
      */
+    @Operation(summary = "Register a user from AuthService", description = "Accessible internally via AuthService call")
     @PostMapping("/register")
     public ResponseEntity<UserDto> registerFromAuth(@Valid @RequestBody UserRegisterDto dto) {
         UserDto createdUser = userService.createFromAuth(dto);
@@ -52,7 +57,8 @@ public class UserController {
     /**
      * Accessible only by ADMIN
      */
-    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Update an existing user", description = "Accessible only by ADMIN")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<UserDto> updateUser(@PathVariable Long id, @Valid @RequestBody UserDto dto) {
         return ResponseEntity.ok(userService.update(id, dto));
@@ -61,7 +67,8 @@ public class UserController {
     /**
      * Accessible only by ADMIN
      */
-    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Delete a user", description = "Accessible only by ADMIN")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         userService.delete(id);
@@ -71,12 +78,14 @@ public class UserController {
     /**
      * Accessible by ADMIN or USER (but USER can only view their own data)
      */
-    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
+    @Operation(summary = "Get user by ID", description = "Accessible by ADMIN or USER (but USER can only view their own data)")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_USER')")
     @GetMapping("/{id}")
     public ResponseEntity<UserDto> getUser(@PathVariable Long id) {
         return ResponseEntity.ok(userService.findById(id));
     }
 
+    @Operation(summary = "Delete user by email (Internal)", description = "Accessible internally")
     @DeleteMapping("/internal/{email}")
     public ResponseEntity<Void> deleteByEmailInternal(@PathVariable String email) {
         userService.deleteByEmail(email);
@@ -86,7 +95,8 @@ public class UserController {
     /**
      * Accessible only by ADMIN
      */
-    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Search users", description = "Accessible only by ADMIN")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @GetMapping
     public ResponseEntity<Page<UserDto>> searchUsers(
             @RequestParam(required = false) List<Long> ids,

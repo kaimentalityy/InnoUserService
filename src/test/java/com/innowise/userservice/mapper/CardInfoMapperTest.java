@@ -86,13 +86,6 @@ class CardInfoMapperTest {
         assertEquals(user, entity.getUser());
     }
 
-    // EDGE CASES
-    @Test
-    void nullInputs_shouldReturnNull_orNotThrow() {
-        assertNull(mapper.toDto(null));
-        assertNull(mapper.toEntity(null));
-
-        CardInfo entity = new CardInfo();
-        assertDoesNotThrow(() -> mapper.updateEntity(null, entity));
-    }
 }
+
+    

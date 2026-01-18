@@ -25,8 +25,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain) throws ServletException, IOException {
+            HttpServletResponse response,
+            FilterChain filterChain) throws ServletException, IOException {
         String header = request.getHeader("Authorization");
 
         try {
@@ -37,9 +37,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     String username = tokenProvider.getUsernameFromToken(token);
                     String role = tokenProvider.getRoleFromToken(token);
 
+                    List<SimpleGrantedAuthority> authorities = List.of();
+                    if (role != null && !role.isBlank()) {
+                        String authority = role.startsWith("ROLE_") ? role : "ROLE_" + role;
+                        authorities = List.of(new SimpleGrantedAuthority(authority));
+                    }
+
                     UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-                            username, null, List.of(new SimpleGrantedAuthority("ROLE_" + role))
-                    );
+                            username, null, authorities);
                     auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(auth);
                 }
@@ -55,7 +60,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        String path = request.getServletPath();
-        return path.startsWith("/api/auth");
+        String path = request.getRequestURI();
+        return path.startsWith("/api/auth") || path.startsWith("/api/users/register");
     }
 }

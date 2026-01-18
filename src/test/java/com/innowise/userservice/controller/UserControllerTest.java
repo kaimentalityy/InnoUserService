@@ -33,8 +33,10 @@ class UserControllerTest {
 
     @Test
     void testCreateUser() {
-        UserDto dto = new UserDto(null, "John", "Doe", LocalDate.now().minusYears(20), "john@example.com", null);
-        UserDto created = new UserDto(1L, "John", "Doe", LocalDate.now().minusYears(20), "john@example.com", null);
+        UserDto dto = new UserDto(null, "John", "Doe", LocalDate.now().minusYears(20), "john@example.com", "ROLE_USER",
+                null);
+        UserDto created = new UserDto(1L, "John", "Doe", LocalDate.now().minusYears(20), "john@example.com",
+                "ROLE_USER", null);
 
         when(userService.create(dto)).thenReturn(created);
 
@@ -47,8 +49,10 @@ class UserControllerTest {
 
     @Test
     void testUpdateUser() {
-        UserDto dto = new UserDto(null, "John", "Doe", LocalDate.now().minusYears(20), "john@example.com", null);
-        UserDto updated = new UserDto(1L, "John", "Doe", LocalDate.now().minusYears(20), "john@example.com", null);
+        UserDto dto = new UserDto(null, "John", "Doe", LocalDate.now().minusYears(20), "john@example.com", "ROLE_USER",
+                null);
+        UserDto updated = new UserDto(1L, "John", "Doe", LocalDate.now().minusYears(20), "john@example.com",
+                "ROLE_USER", null);
 
         when(userService.update(1L, dto)).thenReturn(updated);
 
@@ -71,7 +75,8 @@ class UserControllerTest {
 
     @Test
     void testGetUser() {
-        UserDto user = new UserDto(1L, "John", "Doe", LocalDate.now().minusYears(20), "john@example.com", null);
+        UserDto user = new UserDto(1L, "John", "Doe", LocalDate.now().minusYears(20), "john@example.com", "ROLE_USER",
+                null);
         when(userService.findById(1L)).thenReturn(user);
 
         ResponseEntity<UserDto> response = userController.getUser(1L);
@@ -84,7 +89,8 @@ class UserControllerTest {
     @Test
     void testSearchUsers_byIds() {
         Pageable pageable = Pageable.unpaged();
-        UserDto user = new UserDto(1L, "John", "Doe", LocalDate.now().minusYears(20), "john@example.com", null);
+        UserDto user = new UserDto(1L, "John", "Doe", LocalDate.now().minusYears(20), "john@example.com", "ROLE_USER",
+                null);
 
         when(userService.findByIds(List.of(1L))).thenReturn(List.of(user));
 
@@ -99,11 +105,13 @@ class UserControllerTest {
     @Test
     void testSearchUsers_byEmail() {
         Pageable pageable = Pageable.unpaged();
-        UserDto user = new UserDto(1L, "John", "Doe", LocalDate.now().minusYears(20), "john@example.com", null);
+        UserDto user = new UserDto(1L, "John", "Doe", LocalDate.now().minusYears(20), "john@example.com", "ROLE_USER",
+                null);
 
         when(userService.findByEmail("john@example.com")).thenReturn(user);
 
-        ResponseEntity<Page<UserDto>> response = userController.searchUsers(null, null, null, "john@example.com", pageable);
+        ResponseEntity<Page<UserDto>> response = userController.searchUsers(null, null, null, "john@example.com",
+                pageable);
 
         assertEquals(200, response.getStatusCodeValue());
         assertEquals(1, response.getBody().getTotalElements());
@@ -114,7 +122,8 @@ class UserControllerTest {
     @Test
     void testSearchUsers_standardSearch() {
         Pageable pageable = Pageable.unpaged();
-        UserDto user = new UserDto(1L, "John", "Doe", LocalDate.now().minusYears(20), "john@example.com", null);
+        UserDto user = new UserDto(1L, "John", "Doe", LocalDate.now().minusYears(20), "john@example.com", "ROLE_USER",
+                null);
         Page<UserDto> page = new PageImpl<>(List.of(user));
 
         when(userService.searchUsers("John", "Doe", null, pageable)).thenReturn(page);
@@ -130,7 +139,8 @@ class UserControllerTest {
     @Test
     void testSearchUsers_emptyIdsAndEmail_returnsStandardSearch() {
         Pageable pageable = Pageable.unpaged();
-        UserDto user = new UserDto(1L, "Jane", "Smith", LocalDate.now().minusYears(25), "jane@example.com", null);
+        UserDto user = new UserDto(1L, "Jane", "Smith", LocalDate.now().minusYears(25), "jane@example.com", "ROLE_USER",
+                null);
         Page<UserDto> page = new PageImpl<>(List.of(user));
 
         when(userService.searchUsers(null, null, null, pageable)).thenReturn(page);
@@ -149,7 +159,8 @@ class UserControllerTest {
 
         when(userService.findByEmail("unknown@example.com")).thenReturn(null);
 
-        ResponseEntity<Page<UserDto>> response = userController.searchUsers(null, null, null, "unknown@example.com", pageable);
+        ResponseEntity<Page<UserDto>> response = userController.searchUsers(null, null, null, "unknown@example.com",
+                pageable);
 
         assertEquals(200, response.getStatusCodeValue());
         assertEquals(0, response.getBody().getTotalElements());

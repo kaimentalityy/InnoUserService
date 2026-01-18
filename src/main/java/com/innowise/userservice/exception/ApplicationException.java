@@ -2,6 +2,8 @@ package com.innowise.userservice.exception;
 
 import java.io.Serial;
 import java.io.Serializable;
+
+import com.innowise.userservice.model.enums.ErrorMessage;
 import lombok.Getter;
 
 /**

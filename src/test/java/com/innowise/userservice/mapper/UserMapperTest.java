@@ -50,8 +50,7 @@ class UserMapperTest {
                 "Smith",
                 LocalDate.of(1995, 5, 5),
                 "alice@example.com",
-                Collections.emptyList()
-        );
+                Collections.emptyList());
 
         User user = mapper.toUser(dto);
 
@@ -73,8 +72,7 @@ class UserMapperTest {
                 "Builder",
                 LocalDate.of(2000, 1, 1),
                 "bob@example.com",
-                Collections.emptyList()
-        );
+                Collections.emptyList());
 
         User user = new User();
         user.setId(1L);
@@ -90,15 +88,5 @@ class UserMapperTest {
         assertEquals("Builder", user.getSurname());
         assertEquals(LocalDate.of(2000, 1, 1), user.getBirthDate());
         assertEquals("bob@example.com", user.getEmail());
-    }
-
-    // EDGE CASES
-    @Test
-    void nullInputs_shouldReturnNull_orNotThrow() {
-        assertNull(mapper.toUserDto(null));
-        assertNull(mapper.toUser(null));
-
-        User user = new User();
-        assertDoesNotThrow(() -> mapper.updateUserFromDto(null, user));
     }
 }

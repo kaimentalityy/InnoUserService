@@ -1,5 +1,6 @@
 package com.innowise.userservice.exception;
 
+import com.innowise.userservice.model.enums.ErrorMessage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

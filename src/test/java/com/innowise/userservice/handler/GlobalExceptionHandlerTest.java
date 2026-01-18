@@ -2,6 +2,7 @@ package com.innowise.userservice.handler;
 
 import com.innowise.userservice.exception.*;
 import com.innowise.userservice.model.dto.ErrorDto;
+import com.innowise.userservice.model.enums.ErrorMessage;
 import org.junit.jupiter.api.Test;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.FieldError;
@@ -18,7 +19,7 @@ class GlobalExceptionHandlerTest {
 
     @Test
     void testHandleBadRequestException() {
-        CustomBadRequestException ex = new CustomBadRequestException("invalid input");
+        InvalidRequestException ex = new InvalidRequestException("invalid input");
         ErrorDto dto = handler.handleApplicationException(ex);
 
         assertNotNull(dto);
@@ -28,22 +29,21 @@ class GlobalExceptionHandlerTest {
 
     @Test
     void testHandleConflictException() {
-        CustomConflictException ex = new CustomConflictException("duplicate entity");
+        EntityAlreadyExistsException ex = new EntityAlreadyExistsException("User", "email", "test@example.com");
         ErrorDto dto = handler.handleApplicationException(ex);
 
         assertNotNull(dto);
-        assertTrue(dto.getMessage().contains("Entity already exists") || dto.getMessage().contains("duplicate entity"));
+        assertTrue(dto.getMessage().contains("Entity already exists") || dto.getMessage().contains("already exists"));
         assertEquals(409, dto.getStatus());
     }
 
     @Test
     void testHandleNotFoundException() {
-        CustomNotFoundException ex = new CustomNotFoundException("entity not found");
+        EntityNotFoundException ex = new EntityNotFoundException("User", "id", "123");
         ErrorDto dto = handler.handleApplicationException(ex);
 
         assertNotNull(dto);
-        assertTrue(dto.getMessage().contains("Entity with specified identifier not found")
-                || dto.getMessage().contains("entity not found"));
+        assertTrue(dto.getMessage().contains("not found"));
         assertEquals(404, dto.getStatus());
     }
 
@@ -75,25 +75,5 @@ class GlobalExceptionHandlerTest {
         assertEquals(500, dto.getStatus());
         assertTrue(dto.getMessage().toLowerCase().contains("internal")
                 || dto.getMessage().toLowerCase().contains("unexpected"));
-    }
-
-    // ---- Inner test exception classes ----
-
-    static class CustomBadRequestException extends ApplicationException {
-        public CustomBadRequestException(String message) {
-            super(ErrorMessage.INVALID_REQUEST, message);
-        }
-    }
-
-    static class CustomConflictException extends ApplicationException {
-        public CustomConflictException(String message) {
-            super(ErrorMessage.ENTITY_ALREADY_EXISTS, message);
-        }
-    }
-
-    static class CustomNotFoundException extends ApplicationException {
-        public CustomNotFoundException(String message) {
-            super(ErrorMessage.ENTITY_NOT_FOUND, message);
-        }
     }
 }

@@ -1,4 +1,4 @@
-package com.innowise.userservice.exception;
+package com.innowise.userservice.model.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

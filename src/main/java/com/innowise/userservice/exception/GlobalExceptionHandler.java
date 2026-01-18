@@ -1,6 +1,7 @@
 package com.innowise.userservice.exception;
 
 import com.innowise.userservice.model.dto.ErrorDto;
+import com.innowise.userservice.model.enums.ErrorMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -11,7 +12,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 /**
  * Global exception handler.
  * Handles all custom application exceptions and validation errors,
- * returning consistent {@link ErrorDto} responses with appropriate HTTP status codes.
+ * returning consistent {@link ErrorDto} responses with appropriate HTTP status
+ * codes.
  */
 @RestControllerAdvice
 @Slf4j
@@ -43,6 +45,23 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * Handles security-related exceptions.
+     */
+    @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ErrorDto handleAccessDenied(org.springframework.security.access.AccessDeniedException e) {
+        log.warn("Access denied: {}", e.getMessage());
+        return new ErrorDto("Access Denied", HttpStatus.FORBIDDEN.value());
+    }
+
+    @ExceptionHandler(org.springframework.security.core.AuthenticationException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ErrorDto handleAuthenticationException(org.springframework.security.core.AuthenticationException e) {
+        log.warn("Authentication failed: {}", e.getMessage());
+        return new ErrorDto("Authentication Failed", HttpStatus.UNAUTHORIZED.value());
+    }
+
+    /**
      * Handles unexpected exceptions (fallback).
      */
     @ExceptionHandler(Exception.class)
@@ -68,7 +87,6 @@ public class GlobalExceptionHandler {
 
         return HttpStatus.INTERNAL_SERVER_ERROR;
     }
-
 
     private ErrorDto buildErrorDto(String message, HttpStatus status) {
         return new ErrorDto(message, status.value());

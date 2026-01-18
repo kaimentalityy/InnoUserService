@@ -5,6 +5,7 @@ import com.innowise.userservice.mapper.UserMapper;
 import com.innowise.userservice.model.dto.UserDto;
 import com.innowise.userservice.model.dto.UserRegisterDto;
 import com.innowise.userservice.model.entity.User;
+import com.innowise.userservice.model.enums.UserRole;
 import com.innowise.userservice.repository.dao.UserRepository;
 import com.innowise.userservice.repository.specification.UserSpecification;
 import com.innowise.userservice.service.UserServiceInterface;
@@ -61,6 +62,7 @@ public class UserService implements UserServiceInterface {
     }
 
     @Override
+    @Transactional(readOnly = true)
     @Cacheable(key = "#id")
     public UserDto findById(Long id) {
         User user = userRepository.findById(id)
@@ -80,6 +82,13 @@ public class UserService implements UserServiceInterface {
         user.setBirthDate(dto.birthDate());
         user.setEmail(dto.email());
         user.setCards(new ArrayList<>());
+
+        if (dto.role() != null && !dto.role().isBlank()) {
+            String roleName = dto.role().startsWith("ROLE_") ? dto.role() : "ROLE_" + dto.role();
+            user.setRole(UserRole.valueOf(roleName));
+        } else {
+            user.setRole(UserRole.ROLE_USER);
+        }
 
         User saved = userRepository.save(user);
         return userMapper.toUserDto(saved);
@@ -103,12 +112,12 @@ public class UserService implements UserServiceInterface {
     @Override
     public Page<UserDto> searchUsers(String name, String surname, String email, Pageable pageable) {
         Specification<User> spec = Specification.where(null);
-        if (name != null) spec = spec.and(UserSpecification.hasName(name));
-        if (surname != null) spec = spec.and(UserSpecification.hasSurname(surname));
-        if (email != null) spec = spec.and(UserSpecification.hasEmail(email));
+        if (name != null)
+            spec = spec.and(UserSpecification.hasName(name));
+        if (surname != null)
+            spec = spec.and(UserSpecification.hasSurname(surname));
+        if (email != null)
+            spec = spec.and(UserSpecification.hasEmail(email));
         return userRepository.findAll(spec, pageable).map(userMapper::toUserDto);
     }
 }
-
-
-

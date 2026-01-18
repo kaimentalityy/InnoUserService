@@ -1,14 +1,18 @@
 server:
-  port: ${USER_SERVER_PORT:8082}
+  port: ${USER_SERVICE_PORT:8082}
 
 spring:
+  application:
+    name: inno-user-service
+
   datasource:
-    url: jdbc:postgresql://${USER_DB_HOST:postgres_user}:${USER_DB_PORT:5432}/${USER_DB_NAME:user_db}
+    url: jdbc:postgresql://${USER_DB_HOST:postgres-user}:${USER_DB_PORT:5432}/${USER_DB_NAME:user_db}
     username: ${USER_DB_USERNAME:postgres}
     password: ${USER_DB_PASSWORD:17052007}
     driver-class-name: org.postgresql.Driver
 
   jpa:
+    open-in-view: false
     hibernate:
       ddl-auto: update
     show-sql: true
@@ -16,6 +20,11 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
+
+  security:
+    user:
+      name: none
+      password: none
 
   liquibase:
     enabled: true
@@ -28,4 +37,88 @@ spring:
       timeout: 2000ms
 
 jwt:
-  secret: ${JWT_SECRET:MySuperSecretKeyForJWTMySuperSecretKeyForJWT}
+  secret: MySuperSecretKeyForJWTMySuperSecretKeyForJWT
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+    enabled: true
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+    tagsSorter: alpha
+    docExpansion: none
+    tryItOutEnabled: true
+    filter: true
+    persistAuthorization: true
+    display-request-duration: true
+    show-extensions: true
+    show-common-extensions: true
+    use-root-path: false
+    disable-swagger-default-url: true
+    urls:
+      - url: /v3/api-docs
+        name: User Service API
+  
+  default-produces-media-type: application/json
+  default-consumes-media-type: application/json
+  
+  cache:
+    disabled: false
+    ttl: 0
+  
+  model-and-view-allowed: false
+  
+  override-with-generic-response: false
+  
+  show-actuator: true
+  
+  server:
+    base-path: /
+    context-path: /
+  
+  cors:
+    enabled: true
+    allowed-origins: "*"
+    allowed-methods: "*"
+    allowed-headers: "*"
+    allowed-origin-patterns: "*"
+    max-age: 3600
+    allow-credentials: true
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: always
+      probes:
+        enabled: true
+    prometheus:
+      enabled: true
+  metrics:
+    distribution:
+      percentiles-histogram:
+        '[http.server.requests]': true
+    tags:
+      application: ${spring.application.name:inno-user-service}
+      service: user-service
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+  tracing:
+    sampling:
+      probability: 1.0  
+  otlp:
+    tracing:
+      endpoint: ${TEMPO_ENDPOINT:http://tempo:4318/v1/traces}
+  loki:
+    url: ${LOKI_URL:http://loki:3100}
+
+
+

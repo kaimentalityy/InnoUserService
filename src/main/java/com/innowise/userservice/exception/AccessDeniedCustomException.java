@@ -1,5 +1,7 @@
 package com.innowise.userservice.exception;
 
+import com.innowise.userservice.model.enums.ErrorMessage;
+
 import java.io.Serial;
 
 /**

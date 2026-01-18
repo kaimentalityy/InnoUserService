@@ -4,6 +4,8 @@ import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class JwtTokenProvider {
 
@@ -37,6 +39,29 @@ public class JwtTokenProvider {
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
-        return (String) claims.get("role");
+
+        Object rolesObj = claims.get("roles");
+        if (rolesObj == null) {
+            rolesObj = claims.get("authorities");
+        }
+        if (rolesObj == null) {
+            rolesObj = claims.get("role");
+        }
+
+        if (rolesObj instanceof List<?> list && !list.isEmpty()) {
+            Object first = list.getFirst();
+            if (first instanceof String s) {
+                return s;
+            }
+            if (first instanceof java.util.Map<?, ?> map) {
+                Object auth = map.get("authority");
+                return auth != null ? auth.toString() : "";
+            }
+        } else if (rolesObj instanceof String s) {
+            return s;
+        }
+
+        return "";
     }
+
 }
