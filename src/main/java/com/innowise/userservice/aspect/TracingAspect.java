@@ -96,7 +96,7 @@ public class TracingAspect {
     /**
      * Traces all repository methods.
      */
-    @Around("@within(org.springframework.stereotype.Repository)")
+    @Around("execution(* org.springframework.data.repository.Repository+.*(..)) || @within(org.springframework.stereotype.Repository)")
     public Object traceRepository(ProceedingJoinPoint joinPoint) throws Throwable {
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         String spanName = "repository." + signature.getDeclaringType().getSimpleName()

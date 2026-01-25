@@ -37,7 +37,7 @@ spring:
       timeout: 2000ms
 
 jwt:
-  secret: MySuperSecretKeyForJWTMySuperSecretKeyForJWT
+  secret: ${JWT_SECRET}
 
 springdoc:
   api-docs:
@@ -111,7 +111,12 @@ management:
     metrics:
       export:
         enabled: true
+  observations:
+    key-values:
+      application: ${spring.application.name}
+      service: user-service
   tracing:
+    enabled: true
     sampling:
       probability: 1.0  
   otlp:

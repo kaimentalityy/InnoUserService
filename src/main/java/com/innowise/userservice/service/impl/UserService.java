@@ -9,6 +9,8 @@ import com.innowise.userservice.model.enums.UserRole;
 import com.innowise.userservice.repository.dao.UserRepository;
 import com.innowise.userservice.repository.specification.UserSpecification;
 import com.innowise.userservice.service.UserServiceInterface;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.Timer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
@@ -32,33 +34,49 @@ public class UserService implements UserServiceInterface {
     private final UserMapper userMapper;
     private final CardInfoService cardInfoService;
 
+    private final Counter usersCreatedCounter;
+    private final Counter usersUpdatedCounter;
+    private final Counter usersDeletedCounter;
+    private final Timer userOperationTimer;
+
     @Override
     @Transactional
     @CachePut(key = "#result.id")
     public UserDto create(UserDto dto) {
-        User user = userMapper.toUser(dto);
-        return userMapper.toUserDto(userRepository.save(user));
+        return userOperationTimer.record(() -> {
+            User user = userMapper.toUser(dto);
+            UserDto saved = userMapper.toUserDto(userRepository.save(user));
+            usersCreatedCounter.increment();
+            return saved;
+        });
     }
 
     @Override
     @Transactional
     public UserDto update(Long id, UserDto dto) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("User", "id", id));
-        userMapper.updateUserFromDto(dto, user);
-        return userMapper.toUserDto(userRepository.save(user));
+        return userOperationTimer.record(() -> {
+            User user = userRepository.findById(id)
+                    .orElseThrow(() -> new EntityNotFoundException("User", "id", id));
+            userMapper.updateUserFromDto(dto, user);
+            UserDto updated = userMapper.toUserDto(userRepository.save(user));
+            usersUpdatedCounter.increment();
+            return updated;
+        });
     }
 
     @Override
     @Transactional
     @CacheEvict(key = "#id")
     public void delete(Long id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("User", "id", id));
+        userOperationTimer.record(() -> {
+            User user = userRepository.findById(id)
+                    .orElseThrow(() -> new EntityNotFoundException("User", "id", id));
 
-        user.getCards().forEach(card -> cardInfoService.evictCardFromCache(card.getId()));
+            user.getCards().forEach(card -> cardInfoService.evictCardFromCache(card.getId()));
 
-        userRepository.delete(user);
+            userRepository.delete(user);
+            usersDeletedCounter.increment();
+        });
     }
 
     @Override
