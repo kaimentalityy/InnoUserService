@@ -53,7 +53,7 @@ class UserServiceIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void testFindById_notFound() {
-        assertThrows(EntityNotFoundException.class, () -> userService.findById(999999L));
+        assertThrows(EntityNotFoundException.class, () -> userService.findById("non-existent"));
     }
 
     @Test
@@ -70,7 +70,7 @@ class UserServiceIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void testFindByIds_partialMatch() {
-        List<UserDto> results = userService.findByIds(List.of(123L, testUser.getId()));
+        List<UserDto> results = userService.findByIds(List.of("non-existent", testUser.getId()));
         assertThat(results).hasSize(1);
         assertThat(results.getFirst().email()).isEqualTo("default@example.com");
     }
@@ -135,8 +135,7 @@ class UserServiceIntegrationTest extends BaseIntegrationTest {
                 "Name",
                 LocalDate.of(1999, 9, 9),
                 "updated@example.com",
-                null
-        );
+                null);
 
         UserDto updated = userService.update(testUser.getId(), dto);
 
@@ -146,8 +145,8 @@ class UserServiceIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void testUpdateUser_notFound() {
-        UserDto dto = new UserDto(999L, "Ghost", "User", LocalDate.now(), "ghost@example.com", null);
-        assertThrows(EntityNotFoundException.class, () -> userService.update(999L, dto));
+        UserDto dto = new UserDto("non-existent", "Ghost", "User", LocalDate.now(), "ghost@example.com", null);
+        assertThrows(EntityNotFoundException.class, () -> userService.update("non-existent", dto));
     }
 
     @Test
@@ -159,7 +158,7 @@ class UserServiceIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void testDeleteUser_notFound() {
-        assertThrows(EntityNotFoundException.class, () -> userService.delete(999999L));
+        assertThrows(EntityNotFoundException.class, () -> userService.delete("non-existent"));
     }
 
     @Test
@@ -184,6 +183,7 @@ class UserServiceIntegrationTest extends BaseIntegrationTest {
 
     private User createTestUser(String name, String surname, String email) {
         User user = new User();
+        user.setId(java.util.UUID.randomUUID().toString());
         user.setName(name);
         user.setSurname(surname);
         user.setEmail(email);

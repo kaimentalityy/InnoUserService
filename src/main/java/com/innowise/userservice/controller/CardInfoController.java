@@ -81,7 +81,7 @@ public class CardInfoController {
     @GetMapping
     public ResponseEntity<Page<CardInfoDto>> searchCards(
             @RequestParam(required = false) List<Long> ids,
-            @RequestParam(required = false) Long userId,
+            @RequestParam(required = false) String userId,
             @RequestParam(required = false) String cardNumber,
             @RequestParam(required = false) String cardHolder,
             Pageable pageable) {

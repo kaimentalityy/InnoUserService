@@ -16,7 +16,5 @@ public record UserRegisterDto(
 
         @NotNull(message = "Birth date is required") @Past(message = "Birth date must be in the past") @Schema(description = "User's birth date", example = "1990-01-01") LocalDate birthDate,
 
-        @Schema(description = "User's role", example = "USER") String role,
-
         @NotBlank(message = "Email is required") @Schema(description = "User's email address", example = "john.doe@example.com") String email) {
 }

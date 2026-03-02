@@ -4,16 +4,19 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 /**
  * Custom health indicator for Redis connectivity.
  * Checks if Redis cache is available and responsive.
+ * Only active when spring.data.redis.enabled=true
  */
 @Component
 @RequiredArgsConstructor
 @Slf4j
+@ConditionalOnProperty(name = "spring.data.redis.enabled", havingValue = "true", matchIfMissing = true)
 public class RedisHealthIndicator implements HealthIndicator {
 
     private final RedisTemplate<String, Object> redisTemplate;

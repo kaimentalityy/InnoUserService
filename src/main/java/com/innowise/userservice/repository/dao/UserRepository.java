@@ -18,16 +18,17 @@ import java.util.Optional;
  * </p>
  */
 @Repository
-public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificationExecutor<User> {
+public interface UserRepository extends JpaRepository<User, String>, JpaSpecificationExecutor<User> {
 
     Optional<User> findByEmail(String email);
 
     @Query("SELECT u FROM User u WHERE u.id IN :ids")
-    List<User> findUsersByIds(@Param("ids") List<Long> ids);
+    List<User> findUsersByIds(@Param("ids") List<String> ids);
 
     @Query(value = "SELECT * FROM users WHERE email = :email", nativeQuery = true)
     Optional<User> findUserByEmailNative(@Param("email") String email);
 
     void deleteByEmail(String email);
-}
 
+    boolean existsByEmail(String email);
+}

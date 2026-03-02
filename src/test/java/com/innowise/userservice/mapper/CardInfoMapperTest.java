@@ -24,11 +24,10 @@ class CardInfoMapperTest {
     void toEntity_shouldMapDtoToEntityIgnoringIdAndUser() {
         CardInfoDto dto = new CardInfoDto(
                 1L,
-                5L,
+                "user-5",
                 "1234567890123",
                 "John Doe",
-                LocalDate.of(2030, 12, 31)
-        );
+                LocalDate.of(2030, 12, 31));
 
         CardInfo entity = mapper.toEntity(dto);
 
@@ -42,7 +41,7 @@ class CardInfoMapperTest {
     @Test
     void toDto_shouldMapEntityToDtoIncludingUserId() {
         User user = new User();
-        user.setId(10L);
+        user.setId("user-10");
 
         CardInfo entity = new CardInfo();
         entity.setId(1L);
@@ -62,7 +61,7 @@ class CardInfoMapperTest {
     @Test
     void updateEntity_shouldUpdateFieldsWithoutChangingUser() {
         User user = new User();
-        user.setId(10L);
+        user.setId("user-10");
 
         CardInfo entity = new CardInfo();
         entity.setNumber("1111111111111");
@@ -72,11 +71,10 @@ class CardInfoMapperTest {
 
         CardInfoDto dto = new CardInfoDto(
                 1L,
-                5L,
+                "user-5",
                 "2222222222222",
                 "New Name",
-                LocalDate.of(2030, 12, 31)
-        );
+                LocalDate.of(2030, 12, 31));
 
         mapper.updateEntity(dto, entity);
 
@@ -87,5 +85,3 @@ class CardInfoMapperTest {
     }
 
 }
-
-    

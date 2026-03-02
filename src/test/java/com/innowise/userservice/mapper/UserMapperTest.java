@@ -23,7 +23,7 @@ class UserMapperTest {
     @Test
     void toUserDto_shouldMapAllFields() {
         User user = new User();
-        user.setId(1L);
+        user.setId("a22be142-c4d7-47b1-bef3-f098381b8597");
         user.setName("John");
         user.setSurname("Doe");
         user.setBirthDate(LocalDate.of(1990, 1, 1));
@@ -67,7 +67,7 @@ class UserMapperTest {
     @Test
     void updateUserFromDto_shouldUpdateAllFields_exceptId() {
         UserDto dto = new UserDto(
-                99L,
+                "other-id",
                 "Bob",
                 "Builder",
                 LocalDate.of(2000, 1, 1),
@@ -75,7 +75,7 @@ class UserMapperTest {
                 Collections.emptyList());
 
         User user = new User();
-        user.setId(1L);
+        user.setId("a22be142-c4d7-47b1-bef3-f098381b8597");
         user.setName("Old");
         user.setSurname("Name");
         user.setBirthDate(LocalDate.of(1990, 1, 1));
@@ -83,7 +83,7 @@ class UserMapperTest {
 
         mapper.updateUserFromDto(dto, user);
 
-        assertEquals(1L, user.getId());
+        assertEquals("a22be142-c4d7-47b1-bef3-f098381b8597", user.getId());
         assertEquals("Bob", user.getName());
         assertEquals("Builder", user.getSurname());
         assertEquals(LocalDate.of(2000, 1, 1), user.getBirthDate());

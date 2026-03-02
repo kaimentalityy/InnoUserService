@@ -7,5 +7,7 @@
 
     <include file="changes/01-create-users.xml" relativeToChangelogFile="true"/>
     <include file="changes/02-create-card-info.xml" relativeToChangelogFile="true"/>
+    <include file="changes/03-add-keycloak-id.xml" relativeToChangelogFile="true"/>
+    <include file="changes/04-change-userid-to-string.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

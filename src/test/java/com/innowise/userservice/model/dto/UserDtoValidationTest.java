@@ -27,13 +27,12 @@ class UserDtoValidationTest {
     @Test
     void shouldInvalidateUserDtoWithFutureBirthdateOrInvalidEmail() {
         UserDto dto = new UserDto(
-                1L,
+                "user-1",
                 "",
                 "",
                 LocalDate.now().plusDays(1),
                 "invalid-email",
-                List.of()
-        );
+                List.of());
         Set<ConstraintViolation<UserDto>> violations = validator.validate(dto);
         assertFalse(violations.isEmpty());
         assertTrue(violations.size() >= 3);

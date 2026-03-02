@@ -27,11 +27,10 @@ class DtoEdgeCasesTest {
     void cardInfoWithBlankHolderShouldFailValidation() {
         CardInfoDto card = new CardInfoDto(
                 1L,
-                1L,
+                "user-1",
                 "1234567890123",
                 "",
-                LocalDate.now().plusDays(1)
-        );
+                LocalDate.now().plusDays(1));
 
         Set<ConstraintViolation<CardInfoDto>> violations = validator.validate(card);
         assertFalse(violations.isEmpty());
@@ -44,8 +43,7 @@ class DtoEdgeCasesTest {
                 null,
                 "1234567890123",
                 "John Doe",
-                LocalDate.now().plusDays(1)
-        );
+                LocalDate.now().plusDays(1));
 
         Set<ConstraintViolation<CardInfoDto>> violations = validator.validate(card);
         assertFalse(violations.isEmpty());
@@ -54,13 +52,12 @@ class DtoEdgeCasesTest {
     @Test
     void userDtoWithNullCardsShouldPassValidation() {
         UserDto user = new UserDto(
-                1L,
+                "user-1",
                 "John",
                 "Doe",
                 LocalDate.of(1990, 1, 1),
                 "john@example.com",
-                null
-        );
+                null);
 
         Set<ConstraintViolation<UserDto>> violations = validator.validate(user);
         assertTrue(violations.isEmpty());
@@ -69,13 +66,12 @@ class DtoEdgeCasesTest {
     @Test
     void userDtoWithInvalidEmailShouldFailValidation() {
         UserDto user = new UserDto(
-                1L,
+                "user-1",
                 "John",
                 "Doe",
                 LocalDate.of(1990, 1, 1),
                 "invalid-email",
-                List.of()
-        );
+                List.of());
 
         Set<ConstraintViolation<UserDto>> violations = validator.validate(user);
         assertFalse(violations.isEmpty());
@@ -84,13 +80,12 @@ class DtoEdgeCasesTest {
     @Test
     void userDtoWithFutureBirthDateShouldFailValidation() {
         UserDto user = new UserDto(
-                1L,
+                "user-1",
                 "John",
                 "Doe",
                 LocalDate.now().plusDays(1),
                 "john@example.com",
-                List.of()
-        );
+                List.of());
 
         Set<ConstraintViolation<UserDto>> violations = validator.validate(user);
         assertFalse(violations.isEmpty());

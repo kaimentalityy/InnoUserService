@@ -26,13 +26,12 @@ class UserDtoTest {
     @Test
     void validUserShouldPassValidation() {
         UserDto user = new UserDto(
-                1L,
+                "user-1",
                 "John",
                 "Doe",
                 LocalDate.of(1990, 1, 1),
                 "john.doe@example.com",
-                List.of(new CardInfoDto(1L, 1L, "1234567890123", "John Doe", LocalDate.now().plusDays(1)))
-        );
+                List.of(new CardInfoDto(1L, "user-1", "1234567890123", "John Doe", LocalDate.now().plusDays(1))));
 
         Set<ConstraintViolation<UserDto>> violations = validator.validate(user);
         assertTrue(violations.isEmpty());
@@ -41,13 +40,12 @@ class UserDtoTest {
     @Test
     void invalidEmailShouldFailValidation() {
         UserDto user = new UserDto(
-                1L,
+                "user-1",
                 "John",
                 "Doe",
                 LocalDate.of(1990, 1, 1),
                 "invalid-email",
-                List.of()
-        );
+                List.of());
 
         Set<ConstraintViolation<UserDto>> violations = validator.validate(user);
         assertFalse(violations.isEmpty());
@@ -56,13 +54,12 @@ class UserDtoTest {
     @Test
     void futureBirthDateShouldFailValidation() {
         UserDto user = new UserDto(
-                1L,
+                "user-1",
                 "John",
                 "Doe",
                 LocalDate.now().plusDays(1),
                 "john.doe@example.com",
-                List.of()
-        );
+                List.of());
 
         Set<ConstraintViolation<UserDto>> violations = validator.validate(user);
         assertFalse(violations.isEmpty());

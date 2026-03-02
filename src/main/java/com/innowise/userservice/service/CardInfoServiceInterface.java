@@ -29,7 +29,7 @@ public interface CardInfoServiceInterface extends CrudService<CardInfoDto, Long>
      * @param pageable   pagination information
      * @return page of CardInfoDto
      */
-    Page<CardInfoDto> searchCards(Long userId, String cardNumber, String cardHolder, Pageable pageable);
+    Page<CardInfoDto> searchCards(String userId, String cardNumber, String cardHolder, Pageable pageable);
 
     /**
      * Evicts a card from cache manually.

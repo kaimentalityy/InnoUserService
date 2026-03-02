@@ -42,8 +42,7 @@ class CardInfoRepositoryTest extends BaseIntegrationTest {
         User user = userRepository.save(createUser("Dima", "Kosoy", "dima@kosoy.com"));
         cardInfoRepository.saveAll(List.of(
                 createCard(user, "1111222233334444"),
-                createCard(user, "5555666677778888")
-        ));
+                createCard(user, "5555666677778888")));
 
         List<CardInfo> cards = cardInfoRepository.findByUserId(user.getId());
         assertThat(cards).hasSize(2);
@@ -99,6 +98,7 @@ class CardInfoRepositoryTest extends BaseIntegrationTest {
 
     private User createUser(String name, String surname, String email) {
         User user = new User();
+        user.setId(java.util.UUID.randomUUID().toString());
         user.setName(name);
         user.setSurname(surname);
         user.setBirthDate(LocalDate.of(2000, 1, 1));

@@ -48,8 +48,7 @@ class CardInfoServiceIntegrationTest extends BaseIntegrationTest {
                 defaultUser.getId(),
                 "1234567890123456",
                 "Default User",
-                LocalDate.of(2030, 12, 31)
-        );
+                LocalDate.of(2030, 12, 31));
 
         CardInfoDto created = cardInfoService.create(dto);
 
@@ -62,11 +61,10 @@ class CardInfoServiceIntegrationTest extends BaseIntegrationTest {
     void testCreateCardInfo_userNotFound() {
         CardInfoDto dto = new CardInfoDto(
                 null,
-                999999L,
+                "non-existent",
                 "0000111122223333",
                 "Ghost Holder",
-                LocalDate.of(2030, 12, 31)
-        );
+                LocalDate.of(2030, 12, 31));
 
         assertThrows(EntityNotFoundException.class, () -> cardInfoService.create(dto));
     }
@@ -135,7 +133,8 @@ class CardInfoServiceIntegrationTest extends BaseIntegrationTest {
     @Test
     void testSearchCards_combinedFilters() {
         createTestCard("1000100010001000", defaultUser);
-        Page<CardInfoDto> page = cardInfoService.searchCards(defaultUser.getId(), "1000", "Default User", PageRequest.of(0, 10));
+        Page<CardInfoDto> page = cardInfoService.searchCards(defaultUser.getId(), "1000", "Default User",
+                PageRequest.of(0, 10));
         assertThat(page.getContent()).isNotEmpty();
     }
 
@@ -148,8 +147,7 @@ class CardInfoServiceIntegrationTest extends BaseIntegrationTest {
                 defaultUser.getId(),
                 "1111222233334444",
                 "Updated Holder",
-                LocalDate.of(2035, 1, 1)
-        );
+                LocalDate.of(2035, 1, 1));
 
         CardInfoDto updated = cardInfoService.update(card.getId(), dto);
 
@@ -182,7 +180,8 @@ class CardInfoServiceIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void testCreateThenFetchConsistency() {
-        CardInfoDto dto = new CardInfoDto(null, defaultUser.getId(), "5656565656565656", "Sync User", LocalDate.of(2033, 5, 5));
+        CardInfoDto dto = new CardInfoDto(null, defaultUser.getId(), "5656565656565656", "Sync User",
+                LocalDate.of(2033, 5, 5));
         CardInfoDto created = cardInfoService.create(dto);
         CardInfoDto found = cardInfoService.findById(created.id());
         assertThat(found.number()).isEqualTo("5656565656565656");
@@ -191,12 +190,14 @@ class CardInfoServiceIntegrationTest extends BaseIntegrationTest {
     @Test
     void testRepositoryStateAfterCreate() {
         long before = cardInfoRepository.count();
-        cardInfoService.create(new CardInfoDto(null, defaultUser.getId(), "0000111122223333", "Count Check", LocalDate.of(2031, 11, 11)));
+        cardInfoService.create(new CardInfoDto(null, defaultUser.getId(), "0000111122223333", "Count Check",
+                LocalDate.of(2031, 11, 11)));
         assertThat(cardInfoRepository.count()).isEqualTo(before + 1);
     }
 
     private User createTestUser(String name, String surname, String email) {
         User user = new User();
+        user.setId(java.util.UUID.randomUUID().toString());
         user.setName(name);
         user.setSurname(surname);
         user.setEmail(email);

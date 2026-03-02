@@ -24,11 +24,10 @@ class CardInfoDtoValidationTest {
     void shouldValidateCorrectCardInfoDto() {
         CardInfoDto dto = new CardInfoDto(
                 1L,
-                1L,
+                "user-1",
                 "1234567890123",
                 "John Doe",
-                LocalDate.now().plusDays(1)
-        );
+                LocalDate.now().plusDays(1));
         Set<ConstraintViolation<CardInfoDto>> violations = validator.validate(dto);
         assertTrue(violations.isEmpty());
     }
@@ -37,11 +36,10 @@ class CardInfoDtoValidationTest {
     void shouldInvalidateCardNumberAndExpirationDate() {
         CardInfoDto dto = new CardInfoDto(
                 1L,
-                1L,
+                "user-1",
                 "badnumber",
                 "John Doe",
-                LocalDate.now().minusDays(1)
-        );
+                LocalDate.now().minusDays(1));
         Set<ConstraintViolation<CardInfoDto>> violations = validator.validate(dto);
         assertEquals(1, violations.size());
     }

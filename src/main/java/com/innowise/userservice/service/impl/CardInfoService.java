@@ -79,11 +79,14 @@ public class CardInfoService implements CardInfoServiceInterface {
     }
 
     @Override
-    public Page<CardInfoDto> searchCards(Long userId, String cardNumber, String cardHolder, Pageable pageable) {
+    public Page<CardInfoDto> searchCards(String userId, String cardNumber, String cardHolder, Pageable pageable) {
         Specification<CardInfo> spec = Specification.where(null);
-        if (userId != null) spec = spec.and(CardInfoSpecification.hasUserId(userId));
-        if (cardNumber != null) spec = spec.and(CardInfoSpecification.hasCardNumber(cardNumber));
-        if (cardHolder != null) spec = spec.and(CardInfoSpecification.hasCardHolder(cardHolder));
+        if (userId != null)
+            spec = spec.and(CardInfoSpecification.hasUserId(userId));
+        if (cardNumber != null)
+            spec = spec.and(CardInfoSpecification.hasCardNumber(cardNumber));
+        if (cardHolder != null)
+            spec = spec.and(CardInfoSpecification.hasCardHolder(cardHolder));
         return cardInfoRepository.findAll(spec, pageable).map(cardInfoMapper::toDto);
     }
 
@@ -91,4 +94,3 @@ public class CardInfoService implements CardInfoServiceInterface {
     public void evictCardFromCache(Long id) {
     }
 }
-

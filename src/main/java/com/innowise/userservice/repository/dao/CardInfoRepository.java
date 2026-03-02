@@ -13,13 +13,14 @@ import java.util.List;
  * Repository interface for {@link CardInfo} entities.
  * <p>
  * Provides CRUD operations, as well as custom methods for querying cards
- * by user ID, multiple card IDs, or card number. Supports both JPQL and native SQL queries.
+ * by user ID, multiple card IDs, or card number. Supports both JPQL and native
+ * SQL queries.
  * </p>
  */
 @Repository
-public interface CardInfoRepository extends JpaRepository<CardInfo, Long> , JpaSpecificationExecutor<CardInfo> {
+public interface CardInfoRepository extends JpaRepository<CardInfo, Long>, JpaSpecificationExecutor<CardInfo> {
 
-    List<CardInfo> findByUserId(Long userId);
+    List<CardInfo> findByUserId(String userId);
 
     @Query("SELECT c FROM CardInfo c WHERE c.id IN :ids")
     List<CardInfo> findCardsByIds(@Param("ids") List<Long> ids);

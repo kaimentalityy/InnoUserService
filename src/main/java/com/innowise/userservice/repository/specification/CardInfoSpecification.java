@@ -5,7 +5,7 @@ import org.springframework.data.jpa.domain.Specification;
 
 public class CardInfoSpecification {
 
-    public static Specification<CardInfo> hasUserId(Long userId) {
+    public static Specification<CardInfo> hasUserId(String userId) {
         return (root, query, cb) -> cb.equal(root.get("user").get("id"), userId);
     }
 

@@ -11,7 +11,7 @@ import java.util.List;
 
 @Schema(description = "User Data Transfer Object")
 public record UserDto(
-        @Schema(description = "Unique identifier of the user", example = "1") Long id,
+        @Schema(description = "Unique identifier of the user", example = "a22be142-c4d7-47b1-bef3-f098381b8597") String id,
 
         @NotBlank @Size(max = 100) @Schema(description = "User's first name", example = "John") String name,
 
@@ -21,11 +21,5 @@ public record UserDto(
 
         @NotBlank @Email @Size(max = 255) @Schema(description = "User's email address", example = "john.doe@example.com") String email,
 
-        @Schema(description = "User's role", example = "ROLE_USER") String role,
-
         @Schema(description = "List of user's cards") List<CardInfoDto> cards) {
-
-    public UserDto(Long id, String name, String surname, LocalDate birthDate, String email, List<CardInfoDto> cards) {
-        this(id, name, surname, birthDate, email, "ROLE_USER", cards);
-    }
 }

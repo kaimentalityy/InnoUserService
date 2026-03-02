@@ -62,6 +62,11 @@
         </dependency>
 
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-jackson</artifactId>
             <version>0.11.5</version>
@@ -72,6 +77,12 @@
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
             <version>2.5.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.keycloak</groupId>
+            <artifactId>keycloak-admin-client</artifactId>
+            <version>26.0.0</version>
         </dependency>
 
         <dependency>
@@ -146,6 +157,12 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
             <scope>test</scope>
         </dependency>
 
@@ -239,14 +256,14 @@
                     <target>${java.version}</target>
                     <annotationProcessorPaths>
                         <path>
-                            <groupId>org.mapstruct</groupId>
-                            <artifactId>mapstruct-processor</artifactId>
-                            <version>${mapstruct.version}</version>
-                        </path>
-                        <path>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
                             <version>${lombok.version}</version>
+                        </path>
+                        <path>
+                            <groupId>org.mapstruct</groupId>
+                            <artifactId>mapstruct-processor</artifactId>
+                            <version>${mapstruct.version}</version>
                         </path>
                         <path>
                             <groupId>org.projectlombok</groupId>
@@ -254,6 +271,7 @@
                             <version>${lombok-mapstruct-binding.version}</version>
                         </path>
                     </annotationProcessorPaths>
+                    <proc>full</proc>
                 </configuration>
             </plugin>
 
@@ -302,6 +320,35 @@
                             <formats>
                                 <format>XML</format>
                             </formats>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>check</id>
+                        <goals><goal>check</goal></goals>
+                        <configuration>
+                            <rules>
+                                <rule>
+                                    <element>BUNDLE</element>
+                                    <limits>
+                                        <limit>
+                                            <counter>INSTRUCTION</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>0.80</minimum>
+                                        </limit>
+                                    </limits>
+                                </rule>
+                            </rules>
+                            <excludes>
+                                <exclude>com/innowise/userservice/UserServiceApp.class</exclude>
+                                <exclude>com/innowise/userservice/config/KeycloakConfig.class</exclude>
+                                <exclude>com/innowise/userservice/config/RedisConfig.class</exclude>
+                                <exclude>com/innowise/userservice/config/ValidationConfig.class</exclude>
+                                <exclude>com/innowise/userservice/config/MetricsConfig.class</exclude>
+                                <exclude>com/innowise/userservice/config/OpenApiConfig.class</exclude>
+                                <exclude>com/innowise/userservice/security/SecurityConfig.class</exclude>
+                                <exclude>com/innowise/userservice/aspect/TracingAspect.class</exclude>
+                                <exclude>com/innowise/userservice/mapper/*MapperImpl.class</exclude>
+                            </excludes>
                         </configuration>
                     </execution>
                 </executions>

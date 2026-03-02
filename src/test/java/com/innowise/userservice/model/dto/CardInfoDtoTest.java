@@ -26,11 +26,10 @@ class CardInfoDtoTest {
     void validCardInfoShouldPassValidation() {
         CardInfoDto card = new CardInfoDto(
                 1L,
-                10L,
+                "user-10",
                 "1234567890123",
                 "John Doe",
-                LocalDate.now().plusDays(1)
-        );
+                LocalDate.now().plusDays(1));
 
         Set<ConstraintViolation<CardInfoDto>> violations = validator.validate(card);
         assertTrue(violations.isEmpty());
@@ -43,8 +42,7 @@ class CardInfoDtoTest {
                 null,
                 "1234567890123",
                 "John Doe",
-                LocalDate.now().plusDays(1)
-        );
+                LocalDate.now().plusDays(1));
 
         Set<ConstraintViolation<CardInfoDto>> violations = validator.validate(card);
         assertFalse(violations.isEmpty());
@@ -54,11 +52,10 @@ class CardInfoDtoTest {
     void pastExpirationDateShouldFailValidation() {
         CardInfoDto card = new CardInfoDto(
                 1L,
-                10L,
+                "user-10",
                 "1234567890123",
                 "John Doe",
-                LocalDate.now().minusDays(1)
-        );
+                LocalDate.now().minusDays(1));
 
         Set<ConstraintViolation<CardInfoDto>> violations = validator.validate(card);
         assertFalse(violations.isEmpty());

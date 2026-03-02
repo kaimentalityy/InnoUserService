@@ -1,6 +1,7 @@
 package com.innowise.userservice.controller;
 
-import com.innowise.userservice.model.dto.UserRegisterDto;
+import com.innowise.userservice.model.dto.AuthDto;
+import com.innowise.userservice.model.dto.AuthResponseDto;
 import com.innowise.userservice.service.impl.UserService;
 import com.innowise.userservice.model.dto.UserDto;
 import jakarta.validation.Valid;
@@ -10,7 +11,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -47,10 +50,10 @@ public class UserController {
      * Create a user from AuthService registration
      * Accessible internally via AuthService call
      */
-    @Operation(summary = "Register a user from AuthService", description = "Accessible internally via AuthService call")
+    @Operation(summary = "Register user (Keycloak)")
     @PostMapping("/register")
-    public ResponseEntity<UserDto> registerFromAuth(@Valid @RequestBody UserRegisterDto dto) {
-        UserDto createdUser = userService.createFromAuth(dto);
+    public ResponseEntity<AuthResponseDto> registerFromAuth(@Valid @RequestBody AuthDto dto) {
+        AuthResponseDto createdUser = userService.register(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
     }
 
@@ -60,7 +63,7 @@ public class UserController {
     @Operation(summary = "Update an existing user", description = "Accessible only by ADMIN")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @PutMapping("/{id}")
-    public ResponseEntity<UserDto> updateUser(@PathVariable Long id, @Valid @RequestBody UserDto dto) {
+    public ResponseEntity<UserDto> updateUser(@PathVariable String id, @Valid @RequestBody UserDto dto) {
         return ResponseEntity.ok(userService.update(id, dto));
     }
 
@@ -70,7 +73,7 @@ public class UserController {
     @Operation(summary = "Delete a user", description = "Accessible only by ADMIN")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteUser(@PathVariable String id) {
         userService.delete(id);
         return ResponseEntity.noContent().build();
     }
@@ -81,8 +84,17 @@ public class UserController {
     @Operation(summary = "Get user by ID", description = "Accessible by ADMIN or USER (but USER can only view their own data)")
     @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_USER')")
     @GetMapping("/{id}")
-    public ResponseEntity<UserDto> getUser(@PathVariable Long id) {
-        return ResponseEntity.ok(userService.findById(id));
+    public ResponseEntity<UserDto> getUser(@PathVariable String id) {
+        UserDto user = userService.findById(id);
+
+        String currentUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (!SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
+                .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"))
+                && !user.email().equals(currentUserEmail)) {
+            throw new AccessDeniedException("Access Denied");
+        }
+
+        return ResponseEntity.ok(user);
     }
 
     @Operation(summary = "Delete user by email (Internal)", description = "Accessible internally")
@@ -92,6 +104,47 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(summary = "Get user by ID (Internal)", description = "Accessible internally")
+    @GetMapping("/internal/{id}")
+    public ResponseEntity<UserDto> getUserInternal(@PathVariable String id) {
+        return ResponseEntity.ok(userService.findById(id));
+    }
+
+    @Operation(summary = "Search users (Internal)", description = "Accessible internally")
+    @GetMapping("/internal/search")
+    public ResponseEntity<UserDto> getUserByParametersInternal(
+            @RequestParam(required = false) String email) {
+        if (email != null) {
+            return ResponseEntity.ok(userService.findByEmail(email));
+        }
+        return ResponseEntity.badRequest().build();
+    }
+
+    @Operation(summary = "Get user by email (Internal)", description = "Accessible internally")
+    @GetMapping("/internal/by-email/{email}")
+    public ResponseEntity<UserDto> getUserByEmailInternal(@PathVariable String email) {
+        return ResponseEntity.ok(userService.findByEmail(email));
+    }
+
+    /**
+     * Accessible by the user themselves or ADMIN
+     */
+    @Operation(summary = "Get user by email", description = "Accessible by the user themselves or ADMIN")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_USER')")
+    @GetMapping("/email/{email}")
+    public ResponseEntity<UserDto> getUserByEmail(@PathVariable String email) {
+        UserDto user = userService.findByEmail(email);
+
+        String currentUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (!SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
+                .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"))
+                && !email.equals(currentUserEmail)) {
+            throw new AccessDeniedException("Access Denied");
+        }
+
+        return ResponseEntity.ok(user);
+    }
+
     /**
      * Accessible only by ADMIN
      */
@@ -99,7 +152,7 @@ public class UserController {
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @GetMapping
     public ResponseEntity<Page<UserDto>> searchUsers(
-            @RequestParam(required = false) List<Long> ids,
+            @RequestParam(required = false) List<String> ids,
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String surname,
             @RequestParam(required = false) String email,

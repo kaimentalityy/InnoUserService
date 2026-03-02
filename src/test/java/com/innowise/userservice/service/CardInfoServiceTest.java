@@ -13,8 +13,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.cache.CacheManager;
-import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -35,35 +33,34 @@ class CardInfoServiceTest {
     @InjectMocks
     private CardInfoService cardInfoService;
 
-    private CacheManager cacheManager;
-
     @BeforeEach
     void setup() {
         MockitoAnnotations.openMocks(this);
-        cacheManager = new ConcurrentMapCacheManager("cards");
     }
 
     @Test
     void createCard_success() {
-        CardInfoDto dto = new CardInfoDto(null, 1L, "1234567890123", "John Doe", LocalDate.now().plusDays(1));
+        CardInfoDto dto = new CardInfoDto(null, "a22be142-c4d7-47b1-bef3-f098381b8597", "1234567890123", "John Doe",
+                LocalDate.now().plusDays(1));
         User user = new User();
-        user.setId(1L);
+        user.setId("a22be142-c4d7-47b1-bef3-f098381b8597");
 
         CardInfo cardEntity = new CardInfo();
         CardInfo savedEntity = new CardInfo();
         savedEntity.setId(1L);
 
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepository.findById("a22be142-c4d7-47b1-bef3-f098381b8597")).thenReturn(Optional.of(user));
         when(cardInfoMapper.toEntity(dto)).thenReturn(cardEntity);
         when(cardInfoRepository.save(cardEntity)).thenReturn(savedEntity);
         when(cardInfoMapper.toDto(savedEntity))
-                .thenReturn(new CardInfoDto(1L, 1L, "1234567890123", "John Doe", LocalDate.now().plusDays(1)));
+                .thenReturn(new CardInfoDto(1L, "a22be142-c4d7-47b1-bef3-f098381b8597", "1234567890123", "John Doe",
+                        LocalDate.now().plusDays(1)));
 
         CardInfoDto result = cardInfoService.create(dto);
 
         assertNotNull(result);
         assertEquals(1L, result.id());
-        verify(userRepository).findById(1L);
+        verify(userRepository).findById("a22be142-c4d7-47b1-bef3-f098381b8597");
         verify(cardInfoMapper).toEntity(dto);
         verify(cardInfoRepository).save(cardEntity);
         verify(cardInfoMapper).toDto(savedEntity);
@@ -71,11 +68,12 @@ class CardInfoServiceTest {
 
     @Test
     void createCard_userNotFound() {
-        CardInfoDto dto = new CardInfoDto(null, 999L, "1234567890123", "John Doe", LocalDate.now().plusDays(1));
-        when(userRepository.findById(999L)).thenReturn(Optional.empty());
+        CardInfoDto dto = new CardInfoDto(null, "non-existent", "1234567890123", "John Doe",
+                LocalDate.now().plusDays(1));
+        when(userRepository.findById("non-existent")).thenReturn(Optional.empty());
 
         assertThrows(EntityNotFoundException.class, () -> cardInfoService.create(dto));
-        verify(userRepository).findById(999L);
+        verify(userRepository).findById("non-existent");
         verifyNoInteractions(cardInfoRepository);
     }
 
@@ -84,7 +82,8 @@ class CardInfoServiceTest {
         CardInfo entity = new CardInfo();
         entity.setId(1L);
 
-        CardInfoDto dto = new CardInfoDto(1L, 1L, "1234567890123", "John Doe", LocalDate.now().plusDays(1));
+        CardInfoDto dto = new CardInfoDto(1L, "a22be142-c4d7-47b1-bef3-f098381b8597", "1234567890123", "John Doe",
+                LocalDate.now().plusDays(1));
 
         when(cardInfoRepository.findById(1L)).thenReturn(Optional.of(entity));
         when(cardInfoMapper.toDto(entity)).thenReturn(dto);
@@ -123,7 +122,8 @@ class CardInfoServiceTest {
         CardInfo card = new CardInfo();
         card.setId(1L);
 
-        CardInfoDto dto = new CardInfoDto(1L, 1L, "1234567890123", "John Doe", LocalDate.now().plusDays(1));
+        CardInfoDto dto = new CardInfoDto(1L, "a22be142-c4d7-47b1-bef3-f098381b8597", "1234567890123", "John Doe",
+                LocalDate.now().plusDays(1));
 
         when(cardInfoRepository.findAllById(List.of(1L))).thenReturn(List.of(card));
         when(cardInfoMapper.toDto(card)).thenReturn(dto);

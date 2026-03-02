@@ -52,7 +52,7 @@ class RedisConfigTest {
     @Test
     void testRedisTemplateSerializationRoundTripUserDto() throws Exception {
         ObjectMapper mapper = redisConfig.userDtoObjectMapper();
-        UserDto user = new UserDto(1L, "John", "Doe", LocalDate.of(1990, 1, 1), "john@example.com", null);
+        UserDto user = new UserDto("user-1", "John", "Doe", LocalDate.of(1990, 1, 1), "john@example.com", null);
 
         byte[] bytes = mapper.writeValueAsBytes(user);
         UserDto result = mapper.readValue(bytes, UserDto.class);
@@ -65,7 +65,7 @@ class RedisConfigTest {
     @Test
     void testRedisTemplateSerializationRoundTripCardInfoDto() throws Exception {
         ObjectMapper mapper = redisConfig.userDtoObjectMapper();
-        CardInfoDto card = new CardInfoDto(1L, 1L, "1234567890123456", "John Doe", LocalDate.of(2030, 12, 31));
+        CardInfoDto card = new CardInfoDto(1L, "user-1", "1234567890123456", "John Doe", LocalDate.of(2030, 12, 31));
 
         byte[] bytes = mapper.writeValueAsBytes(card);
         CardInfoDto result = mapper.readValue(bytes, CardInfoDto.class);

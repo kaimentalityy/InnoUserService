@@ -11,7 +11,7 @@ class CardInfoTest {
     @Test
     void testCardInfoFieldsAndAccessors() {
         User user = new User();
-        user.setId(1L);
+        user.setId("user-1");
 
         CardInfo card = new CardInfo();
         card.setId(100L);
@@ -30,7 +30,7 @@ class CardInfoTest {
     @Test
     void testEqualsAndHashCode() {
         User user = new User();
-        user.setId(1L);
+        user.setId("user-1");
 
         CardInfo card1 = new CardInfo();
         card1.setId(1L);
@@ -54,7 +54,7 @@ class CardInfoTest {
     @Test
     void testToStringContainsFields() {
         User user = new User();
-        user.setId(1L);
+        user.setId("user-1");
         user.setName("John");
 
         CardInfo card = new CardInfo();
@@ -71,11 +71,11 @@ class CardInfoTest {
     @Test
     void testUserAssociation() {
         User user = new User();
-        user.setId(5L);
+        user.setId("user-5");
 
         CardInfo card = new CardInfo();
         card.setUser(user);
 
-        assertThat(card.getUser().getId()).isEqualTo(5L);
+        assertThat(card.getUser().getId()).isEqualTo("user-5");
     }
 }

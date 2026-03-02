@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.innowise.userservice.model.dto.CardInfoDto;
 import com.innowise.userservice.model.dto.UserDto;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,7 +24,9 @@ import java.util.Map;
 /**
  * Configuration class for Redis caching setup.
  * Enables and configures Redis as a caching mechanism for the application.
- * Provides custom serialization configuration for Redis cache to handle Java 8 time types.
+ * Provides custom serialization configuration for Redis cache to handle Java 8
+ * time types.
+ * Only active when spring.data.redis.enabled=true
  *
  * @author Your Name
  * @version 1.0
@@ -34,6 +37,7 @@ import java.util.Map;
  */
 @Configuration
 @EnableCaching
+@ConditionalOnProperty(name = "spring.data.redis.enabled", havingValue = "true", matchIfMissing = true)
 public class RedisConfig {
 
     /**
@@ -60,11 +64,9 @@ public class RedisConfig {
 
     @Bean
     public RedisCacheManager cacheManager(RedisConnectionFactory connectionFactory, ObjectMapper mapper) {
-        Jackson2JsonRedisSerializer<UserDto> userSerializer = new Jackson2JsonRedisSerializer<>(UserDto.class);
-        userSerializer.setObjectMapper(mapper);
+        Jackson2JsonRedisSerializer<UserDto> userSerializer = new Jackson2JsonRedisSerializer<>(mapper, UserDto.class);
 
-        Jackson2JsonRedisSerializer<CardInfoDto> cardSerializer = new Jackson2JsonRedisSerializer<>(CardInfoDto.class);
-        cardSerializer.setObjectMapper(mapper);
+        Jackson2JsonRedisSerializer<CardInfoDto> cardSerializer = new Jackson2JsonRedisSerializer<>(mapper, CardInfoDto.class);
 
         Map<String, RedisCacheConfiguration> cacheConfigs = new HashMap<>();
         cacheConfigs.put("users", RedisCacheConfiguration.defaultCacheConfig()
@@ -78,12 +80,12 @@ public class RedisConfig {
     }
 
     @Bean
-    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory, ObjectMapper userDtoObjectMapper) {
+    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory,
+            ObjectMapper userDtoObjectMapper) {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(connectionFactory);
 
-        Jackson2JsonRedisSerializer<Object> serializer = new Jackson2JsonRedisSerializer<>(Object.class);
-        serializer.setObjectMapper(userDtoObjectMapper);
+        GenericJackson2JsonRedisSerializer serializer = new GenericJackson2JsonRedisSerializer(userDtoObjectMapper);
 
         template.setKeySerializer(new StringRedisSerializer());
         template.setValueSerializer(serializer);

@@ -6,17 +6,19 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
-public interface UserServiceInterface extends CrudService<UserDto, Long> {
+public interface UserServiceInterface extends CrudService<UserDto, String> {
 
     /**
      * Returns a list of users by their IDs.
+     * 
      * @param ids list of user IDs
      * @return list of UserDto
      */
-    List<UserDto> findByIds(List<Long> ids);
+    List<UserDto> findByIds(List<String> ids);
 
     /**
      * Finds a user by email.
+     * 
      * @param email user's email
      * @return UserDto
      */
@@ -24,9 +26,10 @@ public interface UserServiceInterface extends CrudService<UserDto, Long> {
 
     /**
      * Searches users by optional filters.
-     * @param name user's name
-     * @param surname user's surname
-     * @param email user's email
+     * 
+     * @param name     user's name
+     * @param surname  user's surname
+     * @param email    user's email
      * @param pageable pagination
      * @return page of UserDto
      */

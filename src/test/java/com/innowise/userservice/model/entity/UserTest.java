@@ -11,13 +11,13 @@ class UserTest {
     @Test
     void testUserFieldsAndAccessors() {
         User user = new User();
-        user.setId(1L);
+        user.setId("user-1");
         user.setName("John");
         user.setSurname("Doe");
         user.setBirthDate(LocalDate.of(1990, 5, 20));
         user.setEmail("john.doe@example.com");
 
-        assertThat(user.getId()).isEqualTo(1L);
+        assertThat(user.getId()).isEqualTo("user-1");
         assertThat(user.getName()).isEqualTo("John");
         assertThat(user.getSurname()).isEqualTo("Doe");
         assertThat(user.getBirthDate()).isEqualTo(LocalDate.of(1990, 5, 20));
@@ -40,15 +40,15 @@ class UserTest {
     @Test
     void testEqualsAndHashCode() {
         User user1 = new User();
-        user1.setId(1L);
+        user1.setId("user-1");
         user1.setEmail("email@example.com");
 
         User user2 = new User();
-        user2.setId(1L);
+        user2.setId("user-1");
         user2.setEmail("email@example.com");
 
         User user3 = new User();
-        user3.setId(2L);
+        user3.setId("user-2");
 
         assertThat(user1).isEqualTo(user2);
         assertThat(user1).isNotEqualTo(user3);
@@ -60,7 +60,7 @@ class UserTest {
     @Test
     void testToStringContainsFields() {
         User user = new User();
-        user.setId(1L);
+        user.setId("user-1");
         user.setName("John");
         user.setSurname("Doe");
         user.setBirthDate(LocalDate.of(1990, 5, 20));

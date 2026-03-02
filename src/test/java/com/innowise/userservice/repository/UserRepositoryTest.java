@@ -53,7 +53,7 @@ class UserRepositoryTest extends BaseIntegrationTest {
     @Test
     void testDeleteUser() {
         User user = userRepository.save(createUser("C", "Three", "c@c.com"));
-        Long id = user.getId();
+        String id = user.getId();
 
         userRepository.deleteById(id);
 
@@ -83,6 +83,7 @@ class UserRepositoryTest extends BaseIntegrationTest {
 
     private User createUser(String name, String surname, String email) {
         User user = new User();
+        user.setId(java.util.UUID.randomUUID().toString());
         user.setName(name);
         user.setSurname(surname);
         user.setBirthDate(LocalDate.of(2000, 1, 1));
