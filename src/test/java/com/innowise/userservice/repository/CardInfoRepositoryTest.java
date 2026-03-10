@@ -85,10 +85,15 @@ class CardInfoRepositoryTest extends BaseIntegrationTest {
     @Test
     void testCascadeDeleteUserAlsoDeletesCards() {
         User user = createUser("Alexander", "Hromoy", "alex@hromoy.com");
-        CardInfo card = createCard(user, "9999888877776666");
-        user.getCards().add(card);
         user = userRepository.save(user);
-
+        userRepository.flush();
+        
+        CardInfo card = createCard(user, "9999888877776666");
+        card = cardInfoRepository.save(card); 
+        user.getCards().add(card); 
+        user = userRepository.save(user); 
+        userRepository.flush();
+        
         Long cardId = card.getId();
         userRepository.delete(user);
         userRepository.flush();

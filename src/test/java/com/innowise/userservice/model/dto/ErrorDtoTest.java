@@ -2,21 +2,25 @@ package com.innowise.userservice.model.dto;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 class ErrorDtoTest {
 
     @Test
-    void lombokGeneratedMethodsShouldWork() {
-        ErrorDto error = new ErrorDto();
-        error.setMessage("Something went wrong");
-        error.setStatus(400);
+    void testBoilerplate() {
+        ErrorDto error1 = new ErrorDto("msg", 400);
+        ErrorDto error2 = new ErrorDto("msg", 400);
+        ErrorDto error3 = new ErrorDto("other", 500);
 
-        assertEquals("Something went wrong", error.getMessage());
-        assertEquals(400, error.getStatus());
+        assertEquals(error1, error2);
+        assertNotEquals(error1, error3);
+        assertEquals(error1.hashCode(), error2.hashCode());
+        assertNotNull(error1.toString());
 
-        ErrorDto error2 = new ErrorDto("Error!", 500);
-        assertEquals("Error!", error2.getMessage());
-        assertEquals(500, error2.getStatus());
+        ErrorDto empty = new ErrorDto();
+        empty.setMessage("m");
+        empty.setStatus(200);
+        assertEquals("m", empty.getMessage());
+        assertEquals(200, empty.getStatus());
     }
 }

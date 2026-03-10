@@ -59,4 +59,18 @@ class RedisHealthIndicatorTest {
         assertEquals("error", health.getDetails().get("status"));
         assertTrue(health.getDetails().containsKey("error"));
     }
+
+    @Test
+    void health_WhenRedisReturnsNotPong_ShouldReturnDown() {
+        when(redisTemplate.getConnectionFactory()).thenReturn(connectionFactory);
+        when(connectionFactory.getConnection()).thenReturn(connection);
+        when(connection.ping()).thenReturn("ERROR");
+
+        Health health = healthIndicator.health();
+
+        assertEquals(Status.DOWN, health.getStatus());
+        assertEquals("Redis", health.getDetails().get("cache"));
+        assertEquals("unreachable", health.getDetails().get("status"));
+        assertEquals("ERROR", health.getDetails().get("response"));
+    }
 }

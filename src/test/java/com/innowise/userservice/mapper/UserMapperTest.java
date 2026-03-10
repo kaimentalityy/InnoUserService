@@ -89,4 +89,12 @@ class UserMapperTest {
         assertEquals(LocalDate.of(2000, 1, 1), user.getBirthDate());
         assertEquals("bob@example.com", user.getEmail());
     }
+
+    @Test
+    void testLinkCardsWithNull() {
+        User user = new User();
+        user.setCards(null);
+        mapper.linkCards(user);
+        assertNull(user.getCards());
+    }
 }

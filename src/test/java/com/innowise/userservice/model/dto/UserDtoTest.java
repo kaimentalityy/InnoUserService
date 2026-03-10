@@ -64,4 +64,45 @@ class UserDtoTest {
         Set<ConstraintViolation<UserDto>> violations = validator.validate(user);
         assertFalse(violations.isEmpty());
     }
+
+    @Test
+    void testAccessors() {
+        String id = "user-1";
+        String name = "John";
+        String surname = "Doe";
+        LocalDate birthDate = LocalDate.of(1990, 1, 1);
+        String email = "john.doe@example.com";
+        List<CardInfoDto> cards = List.of();
+
+        UserDto user = new UserDto(id, name, surname, birthDate, email, cards);
+
+        assertEquals(id, user.id());
+        assertEquals(name, user.name());
+        assertEquals(surname, user.surname());
+        assertEquals(birthDate, user.birthDate());
+        assertEquals(email, user.email());
+        assertEquals(cards, user.cards());
+    }
+
+    @Test
+    void testEqualsAndHashCode() {
+        UserDto user1 = new UserDto("1", "N", "S", LocalDate.of(1990, 1, 1), "e@e.com", List.of());
+        UserDto user2 = new UserDto("1", "N", "S", LocalDate.of(1990, 1, 1), "e@e.com", List.of());
+        UserDto user3 = new UserDto("2", "N", "S", LocalDate.of(1990, 1, 1), "e@e.com", List.of());
+
+        assertEquals(user1, user2);
+        assertNotEquals(user1, user3);
+        assertNotEquals(user1, null);
+        assertNotEquals(user1, "not a user");
+        assertEquals(user1.hashCode(), user2.hashCode());
+        assertNotEquals(user1.hashCode(), user3.hashCode());
+    }
+
+    @Test
+    void testToString() {
+        UserDto user = new UserDto("1", "N", "S", LocalDate.of(1990, 1, 1), "e@e.com", List.of());
+        assertNotNull(user.toString());
+        assertTrue(user.toString().contains("1"));
+        assertTrue(user.toString().contains("N"));
+    }
 }

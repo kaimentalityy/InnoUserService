@@ -28,7 +28,7 @@ class UserControllerExtendedTest {
 
     @BeforeEach
     void setUp() {
-        // set up SecurityContext with ROLE_ADMIN already done where needed
+        
     }
 
     @Test

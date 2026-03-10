@@ -137,8 +137,8 @@ public class MetricsService {
     public void incrementOperationFailure(String operation, String reason) {
         Counter.builder("operation.failure")
                 .description("Total number of failed operations")
-                .tag("operation", operation)
-                .tag("reason", reason)
+                .tag("operation", operation != null ? operation : "unknown")
+                .tag("reason", reason != null ? reason : "unknown")
                 .register(meterRegistry)
                 .increment();
         log.debug("Incremented operation.failure metric for operation: {}, reason: {}", operation, reason);

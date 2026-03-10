@@ -25,8 +25,10 @@ import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.admin.client.resource.RoleMappingResource;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
+import org.keycloak.admin.client.CreatedResponseUtil;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -43,6 +45,8 @@ import java.util.function.Supplier;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
+
+import static org.mockito.Mockito.lenient;
 
 @ExtendWith(org.mockito.junit.jupiter.MockitoExtension.class)
 class UserServiceExtendedTest {
@@ -87,22 +91,13 @@ class UserServiceExtendedTest {
     @BeforeEach
     void setUp() {
         ReflectionTestUtils.setField(userService, "realm", "innowise-realm");
-        ReflectionTestUtils.setField(userService, "keycloakServerUrl", "http://keycloak:8080");
-        ReflectionTestUtils.setField(userService, "clientId", "innowise-client");
-        ReflectionTestUtils.setField(userService, "clientSecret", "secret");
 
-        when(userOperationTimer.record(any(Supplier.class))).thenAnswer(inv -> {
-            Supplier<?> s = inv.getArgument(0);
-            return s.get();
+        
+        lenient().when(userOperationTimer.record(any(Supplier.class))).thenAnswer(inv -> {
+            Supplier<?> supplier = inv.getArgument(0);
+            return supplier.get(); 
         });
-        doAnswer(inv -> {
-            Runnable r = inv.getArgument(0);
-            r.run();
-            return null;
-        }).when(userOperationTimer).record(any(Runnable.class));
     }
-
-    // ---- register ----
 
     @Test
     void register_emailAlreadyExistsInDb_throwsEntityAlreadyExists() {
@@ -155,8 +150,6 @@ class UserServiceExtendedTest {
         when(usersResource.searchByEmail("success@example.com", true)).thenReturn(Collections.emptyList());
         when(usersResource.create(any(UserRepresentation.class))).thenReturn(keycloakResponse);
         when(keycloakResponse.getStatus()).thenReturn(201);
-        when(keycloakResponse.getHeaderString("Location"))
-                .thenReturn("http://keycloak/admin/realms/innowise-realm/users/" + keycloakId);
 
         when(usersResource.get(keycloakId)).thenReturn(userResource);
         doNothing().when(userResource).resetPassword(any());
@@ -181,15 +174,19 @@ class UserServiceExtendedTest {
         when(userMapper.toUserDto(savedUser)).thenReturn(
                 new UserDto(keycloakId, "Alice", "Smith", LocalDate.of(1992, 3, 10), "success@example.com", null));
 
-        AuthResponseDto result = userService.register(dto);
+        
+        try (MockedStatic<CreatedResponseUtil> mockedCreatedResponse = mockStatic(CreatedResponseUtil.class)) {
+            mockedCreatedResponse.when(() -> CreatedResponseUtil.getCreatedId(keycloakResponse))
+                    .thenReturn(keycloakId);
 
-        assertNotNull(result);
-        assertEquals(keycloakId, result.getId());
-        assertEquals("success@example.com", result.getEmail());
-        assertNull(result.getAccessToken());
+            AuthResponseDto result = userService.register(dto);
+
+            assertNotNull(result);
+            assertEquals(keycloakId, result.getId());
+            assertEquals("success@example.com", result.getEmail());
+            assertNull(result.getAccessToken());
+        }
     }
-
-    // ---- update ----
 
     @Test
     void update_userExists_updatesAndReturnsDto() {
@@ -220,8 +217,6 @@ class UserServiceExtendedTest {
                 new UserDto(null, "X", "Y", LocalDate.now().minusYears(20), "x@y.com", null)));
     }
 
-    // ---- findById ----
-
     @Test
     void findById_userExists_returnsDto() {
         String id = "a22be142-c4d7-47b1-bef3-f098381b8597";
@@ -245,7 +240,7 @@ class UserServiceExtendedTest {
         assertThrows(EntityNotFoundException.class, () -> userService.findById("nope"));
     }
 
-    // ---- deleteByEmail ----
+    
 
     @Test
     void deleteByEmail_callsRepositoryDelete() {
@@ -256,7 +251,7 @@ class UserServiceExtendedTest {
         verify(userRepository).deleteByEmail("john@example.com");
     }
 
-    // ---- searchUsers ----
+    
 
     @Test
     void searchUsers_withName_returnsPage() {
