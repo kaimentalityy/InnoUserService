@@ -21,6 +21,9 @@ public class OpenApiConfig {
         @Value("${swagger.keycloak.token-url:http://localhost:8088/realms/innowise-realm/protocol/openid-connect/token}")
         private String tokenUrl;
 
+        @Value("${swagger.keycloak.auth-url:http://localhost:8088/realms/innowise-realm/protocol/openid-connect/auth}")
+        private String authUrl;
+
         @Bean
         public OpenAPI customOpenAPI() {
                 return new OpenAPI()
@@ -35,10 +38,13 @@ public class OpenApiConfig {
                                 .components(new Components()
                                                 .addSecuritySchemes("keycloak", new SecurityScheme()
                                                                 .type(SecurityScheme.Type.OAUTH2)
-                                                                .description("Authenticate via Keycloak (Resource Owner Password Credentials flow)")
+                                                                .description("Authenticate via Keycloak (Authorization Code flow)")
                                                                 .flows(new OAuthFlows()
-                                                                                .password(new OAuthFlow()
+                                                                                .authorizationCode(new OAuthFlow()
+                                                                                                .authorizationUrl(
+                                                                                                                authUrl)
                                                                                                 .tokenUrl(tokenUrl)
+                                                                                                .refreshUrl(tokenUrl)
                                                                                                 .scopes(new Scopes()
                                                                                                                 .addString("openid",
                                                                                                                                 "OpenID Connect scope")

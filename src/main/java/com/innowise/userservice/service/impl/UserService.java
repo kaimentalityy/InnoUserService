@@ -17,6 +17,7 @@ import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.keycloak.admin.client.Keycloak;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
@@ -51,19 +52,11 @@ public class UserService implements UserServiceInterface {
     private final Counter usersUpdatedCounter;
     private final Counter usersDeletedCounter;
     private final Timer userOperationTimer;
+    @Qualifier("adminKeycloak")
     private final Keycloak keycloak;
 
     @Value("${keycloak.realm}")
     private String realm;
-
-    @Value("${keycloak.server-url}")
-    private String keycloakServerUrl;
-
-    @Value("${keycloak.client-id}")
-    private String clientId;
-
-    @Value("${keycloak.client-secret:}")
-    private String clientSecret;
 
     private static UserRepresentation getUserRepresentation(String email, String name, String surname) {
         UserRepresentation user = new UserRepresentation();
@@ -182,9 +175,9 @@ public class UserService implements UserServiceInterface {
     @Transactional(readOnly = true)
     @Cacheable(key = "#id")
     public UserDto findById(String id) {
-        log.info("Finding user by ID: '{}' (length: {}, format: UUID: {})", 
-            id, id.length(), isValidUUID(id));
-        
+        log.info("Finding user by ID: '{}' (length: {}, format: UUID: {})",
+                id, id.length(), isValidUUID(id));
+
         User user = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("User", "id", id));
         return userMapper.toUserDto(user);
     }

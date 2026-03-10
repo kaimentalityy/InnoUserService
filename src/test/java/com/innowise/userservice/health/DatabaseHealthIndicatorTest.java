@@ -56,4 +56,19 @@ class DatabaseHealthIndicatorTest {
         assertEquals("error", health.getDetails().get("status"));
         assertTrue(health.getDetails().containsKey("error"));
     }
+
+    @Test
+    void health_WhenDatabaseIsConnectionInvalid_ShouldReturnDown() throws Exception {
+        when(dataSource.getConnection()).thenReturn(connection);
+        when(connection.isValid(1000)).thenReturn(false);
+
+        Health health = healthIndicator.health();
+
+        assertEquals(Status.DOWN, health.getStatus());
+        assertEquals("PostgreSQL", health.getDetails().get("database"));
+        assertEquals("unreachable", health.getDetails().get("status"));
+        assertEquals("Connection validation failed", health.getDetails().get("reason"));
+
+        verify(connection).close();
+    }
 }

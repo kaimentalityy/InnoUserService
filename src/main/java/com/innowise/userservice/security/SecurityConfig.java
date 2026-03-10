@@ -35,9 +35,6 @@ import java.util.stream.Collectors;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    @Value("${keycloak.resource}")
-    private String resourceName;
-
     @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri:http://keycloak:8080/realms/innowise-realm}")
     private String issuerUri;
 
@@ -92,7 +89,6 @@ public class SecurityConfig {
 
             Map<String, Object> realmAccess = jwt.getClaimAsMap("realm_access");
             log.info("JWT realm_access claim: {}", realmAccess);
-
 
             if (realmAccess != null && realmAccess.get("roles") instanceof List<?> list) {
                 list.stream()

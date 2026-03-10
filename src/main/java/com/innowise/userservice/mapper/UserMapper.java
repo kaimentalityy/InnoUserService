@@ -9,7 +9,6 @@ import org.mapstruct.MappingTarget;
 @Mapper(componentModel = "spring", uses = CardInfoMapper.class)
 public interface UserMapper {
 
-    @Mapping(target = "id", ignore = true)
     User toUser(UserDto dto);
 
     @Mapping(source = "id", target = "id")

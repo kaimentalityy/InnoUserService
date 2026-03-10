@@ -37,7 +37,7 @@ class UserServiceIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void testCreateUser() {
-        UserDto dto = new UserDto(null, "John", "Doe", LocalDate.of(1990, 1, 1), "john@example.com", null);
+        UserDto dto = new UserDto(java.util.UUID.randomUUID().toString(), "John", "Doe", LocalDate.of(1990, 1, 1), "john@example.com", null);
         UserDto created = userService.create(dto);
 
         assertThat(created).isNotNull();
@@ -168,7 +168,8 @@ class UserServiceIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void testCreateAndFetchConsistency() {
-        UserDto dto = new UserDto(null, "Sync", "Check", LocalDate.of(1980, 2, 2), "sync@example.com", null);
+        String userId = java.util.UUID.randomUUID().toString();
+        UserDto dto = new UserDto(userId, "Sync", "Check", LocalDate.of(1980, 2, 2), "sync@example.com", null);
         UserDto created = userService.create(dto);
         UserDto found = userService.findById(created.id());
         assertThat(found.email()).isEqualTo("sync@example.com");
@@ -177,7 +178,7 @@ class UserServiceIntegrationTest extends BaseIntegrationTest {
     @Test
     void testRepositoryStateAfterCreate() {
         long before = userRepository.count();
-        userService.create(new UserDto(null, "Count", "Check", LocalDate.now(), "count@example.com", null));
+        userService.create(new UserDto(java.util.UUID.randomUUID().toString(), "Count", "Check", LocalDate.now(), "count@example.com", null));
         assertThat(userRepository.count()).isEqualTo(before + 1);
     }
 
